@@ -11,7 +11,7 @@ jobs:
     steps:
       # 1. Récupérer le code du repo infrastructure
       - name: Checkout infrastructure repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4   # mise à jour vers v4
 
       # 2. Connexion SSH et déploiement
       - name: Deploy with SSH
@@ -25,3 +25,4 @@ jobs:
             docker-compose -f docker-compose.prod.yml pull
             docker-compose -f docker-compose.prod.yml up -d
             docker ps
+
