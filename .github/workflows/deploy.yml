@@ -20,11 +20,27 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd /home/ubuntu
+
+            # Si le dossier n'existe pas, on clone
             if [ ! -d "infrastructure" ]; then
               git clone https://github.com/DREAMHOUSE-237/infrastructure.git
             fi
+
             cd infrastructure
-            git pull origin main
+
+            # Si le dossier existe mais n'est pas un repo Git valide, on le supprime et on reclone
+            if [ ! -d ".git" ]; then
+              cd ..
+              rm -rf infrastructure
+              git clone https://github.com/DREAMHOUSE-237/infrastructure.git
+              cd infrastructure
+            fi
+
+            # Mise à jour forcée sur la branche main
+            git fetch origin main
+            git reset --hard origin/main
+
+            # Déploiement avec Docker Compose
             docker compose -f docker-compose.prod.yml pull
             docker compose -f docker-compose.prod.yml up -d
             docker ps
