@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  auth-service:
+    image: ${DOCKERHUB_USERNAME}/auth-service:latest
+    container_name: auth-service
+    ports:
+      - "8081:8080"
+    restart: always
