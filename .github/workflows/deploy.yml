@@ -48,9 +48,26 @@ jobs:
             docker compose -f docker-compose.prod.yml up -d
             docker ps
 
-            # Health check automatique
+            # Health check robuste
             echo "Vérification de la santé du service..."
-            sleep 10  # attendre quelques secondes que le container démarre
-            curl -f http://localhost:8081/health || (echo "❌ Service non disponible" && exit 1)
-            echo "✅ Service opérationnel"
+            RETRIES=5
+            DELAY=10
+            SUCCESS=false
+
+            for i in $(seq 1 $RETRIES); do
+              echo "Tentative $i/$RETRIES..."
+              if curl -fs http://localhost:8081/health; then
+                echo "✅ Service opérationnel"
+                SUCCESS=true
+                break
+              else
+                echo "⏳ Service pas encore prêt, nouvelle tentative dans $DELAY secondes..."
+                sleep $DELAY
+              fi
+            done
+
+            if [ "$SUCCESS" = false ]; then
+              echo "❌ Service non disponible après $RETRIES tentatives"
+              exit 1
+            fi
 
