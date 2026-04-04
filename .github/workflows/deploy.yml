@@ -47,3 +47,10 @@ jobs:
             docker compose -f docker-compose.prod.yml pull
             docker compose -f docker-compose.prod.yml up -d
             docker ps
+
+            # Health check automatique
+            echo "Vérification de la santé du service..."
+            sleep 10  # attendre quelques secondes que le container démarre
+            curl -f http://localhost:8080/health || (echo "❌ Service non disponible" && exit 1)
+            echo "✅ Service opérationnel"
+
