@@ -40,8 +40,10 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
 
+            # Injection de la variable Docker Hub depuis les secrets GitHub
+            export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
+
             # Déploiement avec Docker Compose
             docker compose -f docker-compose.prod.yml pull
             docker compose -f docker-compose.prod.yml up -d
             docker ps
-
