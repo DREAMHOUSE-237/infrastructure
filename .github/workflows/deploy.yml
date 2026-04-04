@@ -51,6 +51,6 @@ jobs:
             # Health check automatique
             echo "Vérification de la santé du service..."
             sleep 10  # attendre quelques secondes que le container démarre
-            curl -f http://localhost:8080/health || (echo "❌ Service non disponible" && exit 1)
+            curl -f http://localhost:8081/health || (echo "❌ Service non disponible" && exit 1)
             echo "✅ Service opérationnel"
 
