@@ -2,7 +2,18 @@ name: Deploy to EC2
 
 on:
   repository_dispatch:
-    types: [deploy-auth-service]
+    types:
+      - deploy-auth-service
+      - deploy-user-service
+      - deploy-commentary-service
+      - deploy-recommendation-service
+      - deploy-publication-service
+      - deploy-payment-service
+      - deploy-identity-verification-service
+      - deploy-proxy-service
+      - deploy-registry-service
+      - deploy-config-service
+      - deploy-messagebroker-service
 
 jobs:
   deploy:
@@ -40,15 +51,21 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
 
-            # Injection de la variable Docker Hub depuis les secrets GitHub
+            # Injection des variables sensibles depuis GitHub Secrets
             export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
+            export DB_URL_AUTH=${{ secrets.DB_URL_AUTH }}
+            export DB_URL_USER=${{ secrets.DB_URL_USER }}
+            export DB_URL_COMMENTARY=${{ secrets.DB_URL_COMMENTARY }}
+            export DB_URL_PUBLICATION=${{ secrets.DB_URL_PUBLICATION }}
+            export DB_URL_PAYMENT=${{ secrets.DB_URL_PAYMENT }}
+            export DB_URL_IDENTITY=${{ secrets.DB_URL_IDENTITY }}
 
-            # Déploiement avec Docker Compose
+            # Déploiement avec Docker Compose (service ciblé)
             docker compose -f docker-compose.prod.yml pull
             docker compose -f docker-compose.prod.yml up -d
             docker ps
 
-            # Health check robuste
+            # Health check générique (à adapter par service si besoin)
             echo "Vérification de la santé du service..."
             RETRIES=5
             DELAY=10
@@ -70,4 +87,3 @@ jobs:
               echo "❌ Service non disponible après $RETRIES tentatives"
               exit 1
             fi
-
