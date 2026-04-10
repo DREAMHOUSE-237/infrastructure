@@ -30,6 +30,8 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
+            SERVICE_TYPE=${{ github.event.action }}
+
             cd /home/ubuntu
 
             # Si le dossier n'existe pas, on clone
@@ -56,25 +58,39 @@ jobs:
             export DB_URL_AUTH=${{ secrets.DB_URL_AUTH }}
             export DB_URL_USER=${{ secrets.DB_URL_USER }}
             export DB_URL_COMMENTARY=${{ secrets.DB_URL_COMMENTARY }}
+            export DB_URL_RECOMMENDATION=${{ secrets.DB_URL_RECOMMENDATION }}
             export DB_URL_PUBLICATION=${{ secrets.DB_URL_PUBLICATION }}
             export DB_URL_PAYMENT=${{ secrets.DB_URL_PAYMENT }}
             export DB_URL_IDENTITY=${{ secrets.DB_URL_IDENTITY }}
 
-            # Déploiement avec Docker Compose (service ciblé)
-            docker compose -f docker-compose.prod.yml pull
-            docker compose -f docker-compose.prod.yml up -d
+            # Déploiement ciblé
+            echo "🚀 Déploiement du service ${SERVICE_TYPE}..."
+            docker compose -f docker-compose.prod.yml pull ${SERVICE_TYPE#deploy-}
+            docker compose -f docker-compose.prod.yml up -d ${SERVICE_TYPE#deploy-}
             docker ps
 
-            # Health check générique (à adapter par service si besoin)
-            echo "Vérification de la santé du service..."
+            # Health check dynamique
+            echo "Vérification de la santé du service ${SERVICE_TYPE}..."
             RETRIES=5
             DELAY=10
             SUCCESS=false
 
+            PORT=8081
+            if [ "$SERVICE_TYPE" = "deploy-user-service" ]; then PORT=8082; fi
+            if [ "$SERVICE_TYPE" = "deploy-commentary-service" ]; then PORT=8083; fi
+            if [ "$SERVICE_TYPE" = "deploy-recommendation-service" ]; then PORT=8084; fi
+            if [ "$SERVICE_TYPE" = "deploy-publication-service" ]; then PORT=8085; fi
+            if [ "$SERVICE_TYPE" = "deploy-payment-service" ]; then PORT=8086; fi
+            if [ "$SERVICE_TYPE" = "deploy-identity-verification-service" ]; then PORT=8087; fi
+            if [ "$SERVICE_TYPE" = "deploy-proxy-service" ]; then PORT=8080; fi
+            if [ "$SERVICE_TYPE" = "deploy-registry-service" ]; then PORT=8761; fi
+            if [ "$SERVICE_TYPE" = "deploy-config-service" ]; then PORT=8888; fi
+            if [ "$SERVICE_TYPE" = "deploy-messagebroker-service" ]; then PORT=15672; fi
+
             for i in $(seq 1 $RETRIES); do
               echo "Tentative $i/$RETRIES..."
-              if curl -fs http://localhost:8081/health; then
-                echo "✅ Service opérationnel"
+              if curl -fs http://localhost:$PORT/health; then
+                echo "✅ Service ${SERVICE_TYPE} opérationnel"
                 SUCCESS=true
                 break
               else
@@ -84,6 +100,6 @@ jobs:
             done
 
             if [ "$SUCCESS" = false ]; then
-              echo "❌ Service non disponible après $RETRIES tentatives"
+              echo "❌ Service ${SERVICE_TYPE} non disponible après $RETRIES tentatives"
               exit 1
             fi
