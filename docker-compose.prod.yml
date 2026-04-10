@@ -1,10 +1,129 @@
-version: '3.8'
+#version: '3.8'
+
+#services:
+#  auth-service:
+#    image: ${DOCKERHUB_USERNAME}/auth-service:latest
+#    container_name: auth-service
+#    ports:
+#      - "8081:8080"
+#    restart: always
+
+#version: "3.8"
 
 services:
+  config-service:
+    image: ${DOCKERHUB_USERNAME}/config-service:latest
+    restart: always
+    ports:
+      - "8888:8888"
+
+  registry-service:
+    image: ${DOCKERHUB_USERNAME}/registry-service:latest
+    restart: always
+    ports:
+      - "8761:8761"
+    depends_on:
+      - config-service
+
+  messagebroker-service:
+    image: ${DOCKERHUB_USERNAME}/messagebroker-service:latest
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
   auth-service:
     image: ${DOCKERHUB_USERNAME}/auth-service:latest
-    container_name: auth-service
-    ports:
-      - "8081:8080"
     restart: always
+    environment:
+      - DATABASE_URL=${DB_URL_AUTH}
+    ports:
+      - "8081:8081"
+    depends_on:
+      - config-service
+      - registry-service
+      - messagebroker-service
 
+  user-service:
+    image: ${DOCKERHUB_USERNAME}/user-service:latest
+    restart: always
+    environment:
+      - DATABASE_URL=${DB_URL_USER}
+    ports:
+      - "8082:8082"
+    depends_on:
+      - config-service
+      - registry-service
+      - messagebroker-service
+
+  commentary-service:
+    image: ${DOCKERHUB_USERNAME}/commentary-service:latest
+    restart: always
+    environment:
+      - DATABASE_URL=${DB_URL_COMMENTARY}
+    ports:
+      - "8083:8083"
+    depends_on:
+      - config-service
+      - registry-service
+      - messagebroker-service
+
+  recommendation-service:
+    image: ${DOCKERHUB_USERNAME}/recommendation-service:latest
+    restart: always
+    environment:
+      - DATABASE_URL=${DB_URL_RECOMMENDATION}
+    ports:
+      - "8084:8084"
+    depends_on:
+      - config-service
+      - registry-service
+
+  publication-service:
+    image: ${DOCKERHUB_USERNAME}/publication-service:latest
+    restart: always
+    environment:
+      - DATABASE_URL=${DB_URL_PUBLICATION}
+    ports:
+      - "8085:8085"
+    depends_on:
+      - config-service
+      - registry-service
+
+  payment-service:
+    image: ${DOCKERHUB_USERNAME}/payment-service:latest
+    restart: always
+    environment:
+      - DATABASE_URL=${DB_URL_PAYMENT}
+    ports:
+      - "8086:8086"
+    depends_on:
+      - config-service
+      - registry-service
+
+  identity-service:
+    image: ${DOCKERHUB_USERNAME}/identity-verification-service:latest
+    restart: always
+    environment:
+      - DATABASE_URL=${DB_URL_IDENTITY}
+    ports:
+      - "8087:8087"
+    depends_on:
+      - config-service
+      - registry-service
+
+  proxy-service:
+    image: ${DOCKERHUB_USERNAME}/proxy-service:latest
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      - config-service
+      - registry-service
+      - auth-service
+      - user-service
+      - commentary-service
+      - recommendation-service
+      - publication-service
+      - payment-service
+      - identity-service
