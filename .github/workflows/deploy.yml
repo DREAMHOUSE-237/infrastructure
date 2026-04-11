@@ -6,7 +6,6 @@ on:
       - deploy-auth-service
       - deploy-user-service
       - deploy-commentary-service
-      - deploy-recommendation-service
       - deploy-publication-service
       - deploy-payment-service
       - deploy-identity-verification-service
@@ -58,7 +57,6 @@ jobs:
             export DB_URL_AUTH=${{ secrets.DB_URL_AUTH }}
             export DB_URL_USER=${{ secrets.DB_URL_USER }}
             export DB_URL_COMMENTARY=${{ secrets.DB_URL_COMMENTARY }}
-            export DB_URL_RECOMMENDATION=${{ secrets.DB_URL_RECOMMENDATION }}
             export DB_URL_PUBLICATION=${{ secrets.DB_URL_PUBLICATION }}
             export DB_URL_PAYMENT=${{ secrets.DB_URL_PAYMENT }}
             export DB_URL_IDENTITY=${{ secrets.DB_URL_IDENTITY }}
@@ -68,38 +66,3 @@ jobs:
             docker compose -f docker-compose.prod.yml pull ${SERVICE_TYPE#deploy-}
             docker compose -f docker-compose.prod.yml up -d ${SERVICE_TYPE#deploy-}
             docker ps
-
-            # Health check dynamique
-            echo "Vérification de la santé du service ${SERVICE_TYPE}..."
-            RETRIES=5
-            DELAY=10
-            SUCCESS=false
-
-            PORT=8081
-            if [ "$SERVICE_TYPE" = "deploy-user-service" ]; then PORT=8082; fi
-            if [ "$SERVICE_TYPE" = "deploy-commentary-service" ]; then PORT=8083; fi
-            if [ "$SERVICE_TYPE" = "deploy-recommendation-service" ]; then PORT=8084; fi
-            if [ "$SERVICE_TYPE" = "deploy-publication-service" ]; then PORT=8085; fi
-            if [ "$SERVICE_TYPE" = "deploy-payment-service" ]; then PORT=8086; fi
-            if [ "$SERVICE_TYPE" = "deploy-identity-verification-service" ]; then PORT=8087; fi
-            if [ "$SERVICE_TYPE" = "deploy-proxy-service" ]; then PORT=8080; fi
-            if [ "$SERVICE_TYPE" = "deploy-registry-service" ]; then PORT=8761; fi
-            if [ "$SERVICE_TYPE" = "deploy-config-service" ]; then PORT=8888; fi
-            if [ "$SERVICE_TYPE" = "deploy-messagebroker-service" ]; then PORT=15672; fi
-
-            for i in $(seq 1 $RETRIES); do
-              echo "Tentative $i/$RETRIES..."
-              if curl -fs http://localhost:$PORT/health; then
-                echo "✅ Service ${SERVICE_TYPE} opérationnel"
-                SUCCESS=true
-                break
-              else
-                echo "⏳ Service pas encore prêt, nouvelle tentative dans $DELAY secondes..."
-                sleep $DELAY
-              fi
-            done
-
-            if [ "$SUCCESS" = false ]; then
-              echo "❌ Service ${SERVICE_TYPE} non disponible après $RETRIES tentatives"
-              exit 1
-            fi
