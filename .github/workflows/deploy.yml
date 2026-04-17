@@ -12,7 +12,6 @@ on:
       - deploy-proxy-service
       - deploy-registry-service
       - deploy-config-service
-      - deploy-messagebroker-service
 
 jobs:
   deploy:
@@ -60,6 +59,8 @@ jobs:
             export DB_URL_PUBLICATION=${{ secrets.DB_URL_PUBLICATION }}
             export DB_URL_PAYMENT=${{ secrets.DB_URL_PAYMENT }}
             export DB_URL_IDENTITY=${{ secrets.DB_URL_IDENTITY }}
+            export RABBITMQ_USER=${{ secrets.RABBITMQ_USER }}
+            export RABBITMQ_PASSWORD=${{ secrets.RABBITMQ_PASSWORD }}
 
             # Déploiement ciblé
             echo "🚀 Déploiement du service ${SERVICE_TYPE}..."
