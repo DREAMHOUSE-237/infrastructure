@@ -26,11 +26,16 @@ services:
       - config-service
 
   messagebroker-service:
-    image: ${DOCKERHUB_USERNAME}/messagebroker-service:latest
+    image: rabbitmq:3-management
+    container_name: messagebroker-service
     restart: always
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - "5672:5672"    # port AMQP pour la communication entre services
+      - "15672:15672"  # interface web de management
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+
 
   auth-service:
     image: ${DOCKERHUB_USERNAME}/auth-service:latest
