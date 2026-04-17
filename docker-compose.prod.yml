@@ -73,17 +73,6 @@ services:
       - registry-service
       - messagebroker-service
 
-  recommendation-service:
-    image: ${DOCKERHUB_USERNAME}/recommendation-service:latest
-    restart: always
-    environment:
-      - DATABASE_URL=${DB_URL_RECOMMENDATION}
-    ports:
-      - "8084:8084"
-    depends_on:
-      - config-service
-      - registry-service
-
   publication-service:
     image: ${DOCKERHUB_USERNAME}/publication-service:latest
     restart: always
