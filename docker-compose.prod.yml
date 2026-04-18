@@ -105,7 +105,6 @@ services:
       - auth-service
       - user-service
       - commentary-service
-      - recommendation-service
       - publication-service
       - payment-service
       - identity-service
