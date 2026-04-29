@@ -4,6 +4,14 @@ services:
     restart: always
     ports:
       - "8888:8888"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.20"
+          memory: 128M
+        reservations:
+          cpus: "0.10"
+          memory: 64M
 
   registry-service:
     image: ${DOCKERHUB_USERNAME}/registry-service:latest
@@ -12,18 +20,33 @@ services:
       - "8761:8761"
     depends_on:
       - config-service
+    deploy:
+      resources:
+        limits:
+          cpus: "0.20"
+          memory: 128M
+        reservations:
+          cpus: "0.10"
+          memory: 64M
 
   messagebroker-service:
     image: rabbitmq:3-management
     container_name: messagebroker-service
     restart: always
     ports:
-      - "5672:5672"    # port AMQP pour la communication entre services
-      - "15672:15672"  # interface web de management
+      - "5672:5672"
+      - "15672:15672"
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
-
+    deploy:
+      resources:
+        limits:
+          cpus: "0.30"
+          memory: 256M
+        reservations:
+          cpus: "0.20"
+          memory: 128M
 
   auth-service:
     image: ${DOCKERHUB_USERNAME}/auth-service:latest
@@ -36,6 +59,14 @@ services:
       - config-service
       - registry-service
       - messagebroker-service
+    deploy:
+      resources:
+        limits:
+          cpus: "0.20"
+          memory: 128M
+        reservations:
+          cpus: "0.10"
+          memory: 64M
 
   user-service:
     image: ${DOCKERHUB_USERNAME}/user-service:latest
@@ -48,6 +79,14 @@ services:
       - config-service
       - registry-service
       - messagebroker-service
+    deploy:
+      resources:
+        limits:
+          cpus: "0.20"
+          memory: 128M
+        reservations:
+          cpus: "0.10"
+          memory: 64M
 
   commentary-service:
     image: ${DOCKERHUB_USERNAME}/commentary-service:latest
@@ -60,6 +99,14 @@ services:
       - config-service
       - registry-service
       - messagebroker-service
+    deploy:
+      resources:
+        limits:
+          cpus: "0.20"
+          memory: 128M
+        reservations:
+          cpus: "0.10"
+          memory: 64M
 
   publication-service:
     image: ${DOCKERHUB_USERNAME}/publication-service:latest
@@ -71,6 +118,14 @@ services:
     depends_on:
       - config-service
       - registry-service
+    deploy:
+      resources:
+        limits:
+          cpus: "0.20"
+          memory: 128M
+        reservations:
+          cpus: "0.10"
+          memory: 64M
 
   payment-service:
     image: ${DOCKERHUB_USERNAME}/payment-service:latest
@@ -82,6 +137,14 @@ services:
     depends_on:
       - config-service
       - registry-service
+    deploy:
+      resources:
+        limits:
+          cpus: "0.20"
+          memory: 128M
+        reservations:
+          cpus: "0.10"
+          memory: 64M
 
   identity-service:
     image: ${DOCKERHUB_USERNAME}/identity-verification-service:latest
@@ -93,6 +156,14 @@ services:
     depends_on:
       - config-service
       - registry-service
+    deploy:
+      resources:
+        limits:
+          cpus: "0.20"
+          memory: 128M
+        reservations:
+          cpus: "0.10"
+          memory: 64M
 
   proxy-service:
     image: ${DOCKERHUB_USERNAME}/proxy-service:latest
@@ -108,3 +179,11 @@ services:
       - publication-service
       - payment-service
       - identity-service
+    deploy:
+      resources:
+        limits:
+          cpus: "0.30"
+          memory: 256M
+        reservations:
+          cpus: "0.20"
+          memory: 128M
