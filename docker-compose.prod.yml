@@ -171,6 +171,7 @@ services:
     ports:
       - "8080:8080"
     depends_on:
+      - messagebroker-service
       - config-service
       - registry-service
       - auth-service
