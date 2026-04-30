@@ -170,16 +170,6 @@ services:
     restart: always
     ports:
       - "8080:8080"
-    depends_on:
-      - messagebroker-service
-      - config-service
-      - registry-service
-      - auth-service
-      - user-service
-      - commentary-service
-      - publication-service
-      - payment-service
-      - identity-service
     deploy:
       resources:
         limits:
