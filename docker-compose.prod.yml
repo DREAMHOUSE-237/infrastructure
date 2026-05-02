@@ -55,10 +55,6 @@ services:
       - DATABASE_URL=${DB_URL_AUTH}
     ports:
       - "8081:8081"
-    depends_on:
-      - config-service
-      - registry-service
-      - messagebroker-service
     deploy:
       resources:
         limits:
@@ -75,10 +71,6 @@ services:
       - DATABASE_URL=${DB_URL_USER}
     ports:
       - "8082:8082"
-    depends_on:
-      - config-service
-      - registry-service
-      - messagebroker-service
     deploy:
       resources:
         limits:
@@ -95,10 +87,6 @@ services:
       - DATABASE_URL=${DB_URL_COMMENTARY}
     ports:
       - "8083:8083"
-    depends_on:
-      - config-service
-      - registry-service
-      - messagebroker-service
     deploy:
       resources:
         limits:
@@ -115,9 +103,6 @@ services:
       - DATABASE_URL=${DB_URL_PUBLICATION}
     ports:
       - "8085:8085"
-    depends_on:
-      - config-service
-      - registry-service
     deploy:
       resources:
         limits:
@@ -134,9 +119,6 @@ services:
       - DATABASE_URL=${DB_URL_PAYMENT}
     ports:
       - "8086:8086"
-    depends_on:
-      - config-service
-      - registry-service
     deploy:
       resources:
         limits:
@@ -153,9 +135,6 @@ services:
       - DATABASE_URL=${DB_URL_IDENTITY}
     ports:
       - "8087:8087"
-    depends_on:
-      - config-service
-      - registry-service
     deploy:
       resources:
         limits:
