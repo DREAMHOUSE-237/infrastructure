@@ -53,8 +53,11 @@ services:
     restart: always
     environment:
       - DATABASE_URL=${DB_URL_AUTH}
+      - INSTANCE_HOST=172.31.47.28   # ← IP privée de ton EC2 auth
     ports:
       - "8081:8000"
+      - APP_PORT=8001
+      - EUREKA_URL=http://ec2-16-170-212-130.eu-north-1.compute.amazonaws.com:8761/eureka
     deploy:
       resources:
         limits:
