@@ -58,7 +58,7 @@ services:
       - INSTANCE_HOST=172.31.47.28
       - APP_PORT=8001
       - EUREKA_URL=http://ec2-16-170-212-130.eu-north-1.compute.amazonaws.com:8761/eureka
-      - RABBITMQ_HOST=messagebroker-service
+      - RABBITMQ_HOST=ec2-16-170-212-130.eu-north-1.compute.amazonaws.com
       - RABBITMQ_PORT=5672
       - RABBITMQ_USER=${RABBITMQ_USER}
       - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD}
