@@ -63,8 +63,6 @@ services:
       - RABBITMQ_USER=${RABBITMQ_USER}
       - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD}
       - CONFIG_SERVER_URL=http://ec2-16-170-212-130.eu-north-1.compute.amazonaws.com:8888
-    depends_on:
-      - messagebroker-service
     deploy:
       resources:
         limits:
