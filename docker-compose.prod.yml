@@ -73,20 +73,34 @@ services:
           memory: 64M
 
   user-service:
-    image: ${DOCKERHUB_USERNAME}/user-service:latest
-    restart: always
-    environment:
-      - DATABASE_URL=${DB_URL_USER}
-    ports:
-      - "8082:8082"
-    deploy:
-      resources:
-        limits:
-          cpus: "0.20"
-          memory: 128M
-        reservations:
-          cpus: "0.10"
-          memory: 64M
+      image: ${DOCKERHUB_USERNAME}/user-service:latest
+      restart: always
+      ports:
+        - "8082:8000"
+      environment:
+        - HOST_IP=172.31.47.28
+        - APP_PORT=8082
+        - EUREKA_URL=http://ec2-16-171-142-15.eu-north-1.compute.amazonaws.com:8761
+        - CONFIG_SERVER_URL=http://ec2-16-171-142-15.eu-north-1.compute.amazonaws.com:8888
+        - APP_NAME=users
+        - PROFILE=default
+        - MYSQL_DATABASE=user_db
+        - MYSQL_USER=user_user
+        - MYSQL_PASSWORD=ebate124
+        - MYSQL_HOST=dreamhouse237-db.cbc4i248y7jv.eu-north-1.rds.amazonaws.com
+        - MYSQL_PORT=3306
+        - RABBITMQ_URL=amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@ec2-16-171-142-15.eu-north-1.compute.amazonaws.com:5672/%2f
+        - START_RABBITMQ_CONSUMER=true
+        - FRONTEND_BASE_URL=https://dreamhouse237.onrender.com
+        - RUN_MAIN=true
+      deploy:
+        resources:
+          limits:
+            cpus: "0.20"
+            memory: 128M
+          reservations:
+            cpus: "0.10"
+            memory: 64M
 
   commentary-service:
     image: ${DOCKERHUB_USERNAME}/commentary-service:latest
