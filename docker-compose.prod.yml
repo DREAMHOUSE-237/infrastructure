@@ -176,25 +176,39 @@ services:
           cpus: "0.10"
           memory: 64M
 
+  #socket-proxy:
+  #  image: tecnativa/docker-socket-proxy:latest
+  #  restart: always
+  #  networks:
+  #    - traefik-net
+  #  environment:
+  #    - CONTAINERS=1
+  #    - NETWORKS=1
+  #    - SERVICES=1
+  #    - TASKS=1
+  #    - POST=1
+  #    - VERSION=1.41
+  #  volumes:
+  #    - "/var/run/docker.sock:/var/run/docker.sock:ro"
+  #  deploy:
+  #    resources:
+  #      limits:
+  #        cpus: "0.10"
+  #        memory: 64M
+
   socket-proxy:
-    image: tecnativa/docker-socket-proxy:latest
+    image: alpine/socat
     restart: always
     networks:
       - traefik-net
-    environment:
-      - CONTAINERS=1
-      - NETWORKS=1
-      - SERVICES=1
-      - TASKS=1
-      - POST=1
-      - VERSION=1.41
+    command: TCP-LISTEN:2375,fork,reuseaddr UNIX-CONNECT:/var/run/docker.sock
     volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "/var/run/docker.sock:/var/run/docker.sock"
     deploy:
       resources:
         limits:
           cpus: "0.10"
-          memory: 64M
+          memory: 32M
 
   traefik:
     image: traefik:v3.3
