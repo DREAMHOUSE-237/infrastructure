@@ -196,7 +196,7 @@ services:
           memory: 64M
 
   traefik:
-    image: traefik:v2.10
+    image: traefik:v3.3
     restart: always
     ports:
       - "80:80"
