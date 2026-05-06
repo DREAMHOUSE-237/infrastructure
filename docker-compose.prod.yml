@@ -57,7 +57,7 @@ services:
     image: ${DOCKERHUB_USERNAME}/auth-service:latest
     restart: always
     ports:
-      - "8081:8000"
+      - "8081:8001"
     environment:
       - DATABASE_URL=${DB_URL_AUTH}
       - INSTANCE_HOST=172.31.47.28
@@ -195,16 +195,51 @@ services:
           cpus: "0.10"
           memory: 64M
 
-  proxy-service:
-    image: ${DOCKERHUB_USERNAME}/proxy-service:latest
+  traefik:
+    image: traefik:v3.0
     restart: always
     ports:
-      - "8080:8080"
+      - "80:80"
+      - "443:443"
+    command:
+      - "--api.insecure=false"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      #- "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
+      - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
+      - "--certificatesresolvers.myresolver.acme.email=htchamba124@gmail.com"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+      # Redirect HTTP → HTTPS
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "letsencrypt:/letsencrypt"
     deploy:
       resources:
         limits:
-          cpus: "0.30"
-          memory: 256M
-        reservations:
           cpus: "0.20"
           memory: 128M
+
+  proxy-service:
+      image: ${DOCKERHUB_USERNAME}/proxy-service:latest
+      restart: always
+      expose:
+        - "8080"
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.proxy.rule=Host(`api.16.171.142.15.nip.io`)"
+        - "traefik.http.routers.proxy.entrypoints=websecure"
+        - "traefik.http.routers.proxy.tls.certresolver=myresolver"
+        - "traefik.http.services.proxy.loadbalancer.server.port=8080"
+      deploy:
+        resources:
+          limits:
+            cpus: "0.30"
+            memory: 256M
+
+  volumes:
+    letsencrypt:
