@@ -1,0 +1,15 @@
+http:
+  routers:
+    proxy:
+      rule: "Host(`api.16.171.142.15.nip.io`)"
+      entryPoints:
+        - websecure
+      tls:
+        certResolver: myresolver
+      service: proxy-service
+
+  services:
+    proxy-service:
+      loadBalancer:
+        servers:
+          - url: "http://proxy-service:8080"

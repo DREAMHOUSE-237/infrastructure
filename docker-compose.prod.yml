@@ -176,73 +176,6 @@ services:
           cpus: "0.10"
           memory: 64M
 
-  #socket-proxy:
-  #  image: tecnativa/docker-socket-proxy:latest
-  #  restart: always
-  #  networks:
-  #    - traefik-net
-  #  environment:
-  #    - CONTAINERS=1
-  #    - NETWORKS=1
-  #    - SERVICES=1
-  #    - TASKS=1
-  #    - POST=1
-  #    - VERSION=1.41
-  #  volumes:
-  #    - "/var/run/docker.sock:/var/run/docker.sock:ro"
-  #  deploy:
-  #    resources:
-  #      limits:
-  #        cpus: "0.10"
-  #        memory: 64M
-
-  socket-proxy:
-    image: alpine/socat
-    restart: always
-    networks:
-      - traefik-net
-    command: TCP-LISTEN:2375,fork,reuseaddr UNIX-CONNECT:/var/run/docker.sock
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock"
-    deploy:
-      resources:
-        limits:
-          cpus: "0.10"
-          memory: 32M
-
-  traefik:
-    image: traefik:v3.3
-    restart: always
-    networks:
-      - traefik-net
-    depends_on:
-      - socket-proxy
-    ports:
-      - "80:80"
-      - "443:443"
-    command:
-      - "--log.level=DEBUG"
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      - "--providers.docker.endpoint=tcp://socket-proxy:2375"
-      - "--providers.docker.network=traefik-net"
-      - "--providers.docker.watch=true"
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
-      - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
-      - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
-      - "--certificatesresolvers.myresolver.acme.email=htchamba124@gmail.com"
-      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
-      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
-      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
-    volumes:
-      - "./letsencrypt:/letsencrypt"
-    deploy:
-      resources:
-        limits:
-          cpus: "0.20"
-          memory: 128M
-
   proxy-service:
     image: ${DOCKERHUB_USERNAME}/proxy-service:latest
     restart: always
@@ -250,15 +183,37 @@ services:
       - traefik-net
     expose:
       - "8080"
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.proxy.rule=Host(`api.16.171.142.15.nip.io`)"
-      - "traefik.http.routers.proxy.entrypoints=websecure"
-      - "traefik.http.routers.proxy.tls.certresolver=myresolver"
-      - "traefik.http.services.proxy.loadbalancer.server.port=8080"
-      - "traefik.docker.network=traefik-net"
     deploy:
       resources:
         limits:
           cpus: "0.30"
           memory: 256M
+
+  traefik:
+    image: traefik:v3.3
+    restart: always
+    networks:
+      - traefik-net
+    ports:
+      - "80:80"
+      - "443:443"
+    command:
+      - "--log.level=INFO"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
+      - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
+      - "--certificatesresolvers.myresolver.acme.email=htchamba124@gmail.com"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+      - "--providers.file.filename=/etc/traefik/dynamic.yml"
+      - "--providers.file.watch=true"
+    volumes:
+      - "./letsencrypt:/letsencrypt"
+      - "./traefik-dynamic.yml:/etc/traefik/dynamic.yml:ro"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.20"
+          memory: 128M
