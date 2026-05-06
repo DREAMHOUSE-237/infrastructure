@@ -1,7 +1,8 @@
 version: "3.9"
 
-# NOTE : seul le bloc user-service a été modifié.
-# Tous les autres services sont identiques à ton docker-compose original.
+networks:
+  traefik-net:
+    driver: bridge
 
 services:
   config-service:
@@ -77,25 +78,6 @@ services:
           cpus: "0.10"
           memory: 64M
 
-  # ════════════════════════════════════════════════════════════════════
-  # USER SERVICE — CORRECTIONS
-  #
-  # 1. Suppression de RUN_MAIN=true
-  #    Cette variable ne doit PAS être injectée comme variable d'env
-  #    du conteneur. Django l'utilise uniquement en interne avec runserver
-  #    pour distinguer le reloader du processus principal. Dans Docker avec
-  #    Gunicorn, la mettre dans l'env la rendait visible à TOUS les workers
-  #    → chaque worker lançait 2 subprocesses Django (~300 MB cumulés).
-  #
-  # 2. GUNICORN_MAIN_PID injecté dans le Dockerfile CMD (pas ici)
-  #    Le Dockerfile utilise $$ (PID du shell) pour marquer le master.
-  #    apps.py compare os.getpid() avec cette valeur → threads lancés
-  #    UNE SEULE FOIS dans le master, jamais dans les workers.
-  #
-  # 3. Mémoire réduite de 512M → 256M
-  #    Objectif atteint grâce aux corrections ci-dessus.
-  #    Si tu constates encore une pression, repasse à 320M provisoirement.
-  # ════════════════════════════════════════════════════════════════════
   user-service:
     image: ${DOCKERHUB_USERNAME}/user-service:latest
     restart: always
@@ -115,13 +97,12 @@ services:
       - MYSQL_PORT=3306
       - RABBITMQ_URL=amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@ec2-16-171-142-15.eu-north-1.compute.amazonaws.com:5672/%2f
       - START_RABBITMQ_CONSUMER=true
-      # ↓ RUN_MAIN=true SUPPRIMÉ — c'était la cause de l'explosion mémoire
       - FRONTEND_BASE_URL=https://dreamhouse237.onrender.com
     deploy:
       resources:
         limits:
           cpus: "0.30"
-          memory: 256M        # ← réduit de 512M à 256M
+          memory: 256M
         reservations:
           cpus: "0.10"
           memory: 128M
@@ -198,6 +179,8 @@ services:
   socket-proxy:
     image: tecnativa/docker-socket-proxy:latest
     restart: always
+    networks:
+      - traefik-net
     environment:
       - CONTAINERS=1
       - NETWORKS=1
@@ -212,46 +195,52 @@ services:
           memory: 64M
 
   traefik:
-      image: traefik:v3.3
-      restart: always
-      depends_on:
-        - socket-proxy
-      ports:
-        - "80:80"
-        - "443:443"
-      command:
-        - "--providers.docker=true"
-        - "--providers.docker.exposedbydefault=false"
-        - "--providers.docker.endpoint=tcp://socket-proxy:2375"
-        - "--entrypoints.web.address=:80"
-        - "--entrypoints.websecure.address=:443"
-        - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
-        - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
-        - "--certificatesresolvers.myresolver.acme.email=htchamba124@gmail.com"
-        - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
-        - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
-        - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
-      volumes:
-        - "./letsencrypt:/letsencrypt"
-      deploy:
-        resources:
-          limits:
-            cpus: "0.20"
-            memory: 128M
+    image: traefik:v3.3
+    restart: always
+    networks:
+      - traefik-net
+    depends_on:
+      - socket-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.endpoint=tcp://socket-proxy:2375"
+      - "--providers.docker.network=traefik-net"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
+      - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
+      - "--certificatesresolvers.myresolver.acme.email=htchamba124@gmail.com"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+    volumes:
+      - "./letsencrypt:/letsencrypt"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.20"
+          memory: 128M
 
   proxy-service:
-      image: ${DOCKERHUB_USERNAME}/proxy-service:latest
-      restart: always
-      expose:
-        - "8080"
-      labels:
-        - "traefik.enable=true"
-        - "traefik.http.routers.proxy.rule=Host(`api.16.171.142.15.nip.io`)"
-        - "traefik.http.routers.proxy.entrypoints=websecure"
-        - "traefik.http.routers.proxy.tls.certresolver=myresolver"
-        - "traefik.http.services.proxy.loadbalancer.server.port=8080"
-      deploy:
-        resources:
-          limits:
-            cpus: "0.30"
-            memory: 256M
+    image: ${DOCKERHUB_USERNAME}/proxy-service:latest
+    restart: always
+    networks:
+      - traefik-net
+    expose:
+      - "8080"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.proxy.rule=Host(`api.16.171.142.15.nip.io`)"
+      - "traefik.http.routers.proxy.entrypoints=websecure"
+      - "traefik.http.routers.proxy.tls.certresolver=myresolver"
+      - "traefik.http.services.proxy.loadbalancer.server.port=8080"
+      - "traefik.docker.network=traefik-net"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.30"
+          memory: 256M
