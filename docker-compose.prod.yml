@@ -217,7 +217,7 @@ services:
       - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "letsencrypt:/letsencrypt"
+      - "./letsencrypt:/letsencrypt"
     deploy:
       resources:
         limits:
@@ -240,6 +240,3 @@ services:
           limits:
             cpus: "0.30"
             memory: 256M
-
-  volumes:
-    letsencrypt:
