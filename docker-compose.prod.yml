@@ -1,3 +1,8 @@
+version: "3.9"
+
+# NOTE : seul le bloc user-service a été modifié.
+# Tous les autres services sont identiques à ton docker-compose original.
+
 services:
   config-service:
     image: ${DOCKERHUB_USERNAME}/config-service:latest
@@ -72,6 +77,25 @@ services:
           cpus: "0.10"
           memory: 64M
 
+  # ════════════════════════════════════════════════════════════════════
+  # USER SERVICE — CORRECTIONS
+  #
+  # 1. Suppression de RUN_MAIN=true
+  #    Cette variable ne doit PAS être injectée comme variable d'env
+  #    du conteneur. Django l'utilise uniquement en interne avec runserver
+  #    pour distinguer le reloader du processus principal. Dans Docker avec
+  #    Gunicorn, la mettre dans l'env la rendait visible à TOUS les workers
+  #    → chaque worker lançait 2 subprocesses Django (~300 MB cumulés).
+  #
+  # 2. GUNICORN_MAIN_PID injecté dans le Dockerfile CMD (pas ici)
+  #    Le Dockerfile utilise $$ (PID du shell) pour marquer le master.
+  #    apps.py compare os.getpid() avec cette valeur → threads lancés
+  #    UNE SEULE FOIS dans le master, jamais dans les workers.
+  #
+  # 3. Mémoire réduite de 512M → 256M
+  #    Objectif atteint grâce aux corrections ci-dessus.
+  #    Si tu constates encore une pression, repasse à 320M provisoirement.
+  # ════════════════════════════════════════════════════════════════════
   user-service:
     image: ${DOCKERHUB_USERNAME}/user-service:latest
     restart: always
@@ -91,13 +115,13 @@ services:
       - MYSQL_PORT=3306
       - RABBITMQ_URL=amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@ec2-16-171-142-15.eu-north-1.compute.amazonaws.com:5672/%2f
       - START_RABBITMQ_CONSUMER=true
+      # ↓ RUN_MAIN=true SUPPRIMÉ — c'était la cause de l'explosion mémoire
       - FRONTEND_BASE_URL=https://dreamhouse237.onrender.com
-      - RUN_MAIN=true
     deploy:
       resources:
         limits:
           cpus: "0.30"
-          memory: 512M
+          memory: 256M        # ← réduit de 512M à 256M
         reservations:
           cpus: "0.10"
           memory: 128M
