@@ -185,6 +185,8 @@ services:
       - CONTAINERS=1
       - NETWORKS=1
       - SERVICES=1
+      - TASKS=1
+      - POST=1
       - VERSION=1.41
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
@@ -205,10 +207,12 @@ services:
       - "80:80"
       - "443:443"
     command:
+      - "--log.level=DEBUG"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--providers.docker.endpoint=tcp://socket-proxy:2375"
       - "--providers.docker.network=traefik-net"
+      - "--providers.docker.watch=true"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
       - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
