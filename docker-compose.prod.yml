@@ -131,18 +131,20 @@ services:
   publication-service:
     image: ${DOCKERHUB_USERNAME}/publication-service:latest
     restart: always
-    environment:
-      - DATABASE_URL=${DB_URL_PUBLICATION}
     ports:
       - "8085:8085"
+    environment:
+      - RABBITMQ_USER=${RABBITMQ_USER}
+      - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD}
+      - JAVA_OPTS=-Xmx96m -Xms64m
     deploy:
       resources:
         limits:
           cpus: "0.20"
-          memory: 128M
+          memory: 256M
         reservations:
           cpus: "0.10"
-          memory: 64M
+          memory: 128M
 
   payment-service:
     image: ${DOCKERHUB_USERNAME}/payment-service:latest
