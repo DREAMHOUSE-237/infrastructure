@@ -149,18 +149,40 @@ services:
   payment-service:
     image: ${DOCKERHUB_USERNAME}/payment-service:latest
     restart: always
-    environment:
-      - DATABASE_URL=${DB_URL_PAYMENT}
     ports:
       - "8086:8086"
+    environment:
+      - HOST_IP=172.31.47.28
+      - APP_PORT=8086
+      - EUREKA_URL=http://ec2-16-171-142-15.eu-north-1.compute.amazonaws.com:8761/eureka
+      - CONFIG_SERVER_URL=http://ec2-16-171-142-15.eu-north-1.compute.amazonaws.com:8888
+      - MYSQL_USER=payment_user
+      - MYSQL_PASSWORD=nflorinda124
+      - MYSQL_HOST=dreamhouse237-db.cbc4i248y7jv.eu-north-1.rds.amazonaws.com
+      - MYSQL_PORT=3306
+      - MYSQL_DB=payment_db
+      - RABBITMQ_HOST=ec2-16-171-142-15.eu-north-1.compute.amazonaws.com
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USER=${RABBITMQ_USER}
+      - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD}
+      - CAMPAY_TOKEN=920893519f0eeebc45a094369d7ef0084d7b84e4
+      - CAMPAY_USERNAME=J4BfWLgiV6q2xmJpyd1K5rMQg50Gb7i9e81ChV-XnwoX08i9N-H56PEkeLkyvXNiTlNA0uyAVwA_I8UGugSvNA
+      - CAMPAY_PASSWORD=5VmgvsGdZy7ZPkptgXgN-eH5vLuo6reNvFlTpHAWQWaKdmXHtjkm9K9hX658cO7HPkpfFq_Icn6dikaKnIJv8Q
+      - CAMPAY_BASE_URL=https://demo.campay.net/api
+      - MAIL_USERNAME=dreamhouse2372025@gmail.com
+      - MAIL_PASSWORD=krwq byrr ywtj jwto
+      - MAIL_DEFAULT_SENDER=dreamhouse2372025@gmail.com
+      - SECRET_KEY=dev_key
+      - PAYMENT_INIT_QUEUE=payment-queue
+      - PAYMENT_STATUS_QUEUE=payment-status
     deploy:
       resources:
         limits:
           cpus: "0.20"
-          memory: 128M
+          memory: 256M
         reservations:
           cpus: "0.10"
-          memory: 64M
+          memory: 128M
 
   identity-service:
     image: ${DOCKERHUB_USERNAME}/identity-verification-service:latest
