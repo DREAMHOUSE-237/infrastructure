@@ -204,7 +204,6 @@ services:
       - MYSQL_HOST=dreamhouse237-db.cbc4i248y7jv.eu-north-1.rds.amazonaws.com
       - MYSQL_PORT=3306
       - RABBITMQ_URL=amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@ec2-16-171-142-15.eu-north-1.compute.amazonaws.com:5672/%2f
-      - SECRET_KEY=${SECRET_KEY}
     deploy:
       resources:
         limits:
