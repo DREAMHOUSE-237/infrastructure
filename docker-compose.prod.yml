@@ -136,7 +136,7 @@ services:
     environment:
       - RABBITMQ_USER=${RABBITMQ_USER}
       - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD}
-      - JAVA_TOOL_OPTIONS=-Xmx128m -Xms64m -XX:+UseSerialGC -XX:MaxMetaspaceSize=64m
+      - JAVA_TOOL_OPTIONS=-Xmx96m -Xms48m -XX:+UseSerialGC -XX:MaxMetaspaceSize=128m -XX:CompressedClassSpaceSize=32m
     deploy:
       resources:
         limits:
