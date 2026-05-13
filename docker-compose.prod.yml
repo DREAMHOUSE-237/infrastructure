@@ -184,21 +184,35 @@ services:
           cpus: "0.10"
           memory: 128M
 
-  identity-service:
-    image: ${DOCKERHUB_USERNAME}/identity-verification-service:latest
-    restart: always
-    environment:
-      - DATABASE_URL=${DB_URL_IDENTITY}
-    ports:
-      - "8087:8087"
-    deploy:
-      resources:
-        limits:
-          cpus: "0.20"
-          memory: 128M
-        reservations:
-          cpus: "0.10"
-          memory: 64M
+  identity-verification-service:
+  image: ${DOCKERHUB_USERNAME}/identity-verification-service:latest
+  restart: always
+  ports:
+    - "8087:8087"
+  environment:
+    - DJANGO_ENV=production
+    - WORKER_ID=0
+    - HOST_IP=172.31.47.28
+    - APP_PORT=8087
+    - EUREKA_URL=http://ec2-16-171-142-15.eu-north-1.compute.amazonaws.com:8761/eureka
+    - CONFIG_SERVER_URL=http://ec2-16-171-142-15.eu-north-1.compute.amazonaws.com:8888
+    - APP_NAME=IDENTITY-SERVICE
+    - PROFILE=default
+    - MYSQL_DATABASE=identity_verification_db
+    - MYSQL_USER=identity_user
+    - MYSQL_PASSWORD=ebate124
+    - MYSQL_HOST=dreamhouse237-db.cbc4i248y7jv.eu-north-1.rds.amazonaws.com
+    - MYSQL_PORT=3306
+    - RABBITMQ_URL=amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@ec2-16-171-142-15.eu-north-1.compute.amazonaws.com:5672/%2f
+    - SECRET_KEY=${SECRET_KEY}
+  deploy:
+    resources:
+      limits:
+        cpus: "0.20"
+        memory: 256M
+      reservations:
+        cpus: "0.10"
+        memory: 128M
 
   proxy-service:
     image: ${DOCKERHUB_USERNAME}/proxy-service:latest
