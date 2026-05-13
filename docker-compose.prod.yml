@@ -136,15 +136,15 @@ services:
     environment:
       - RABBITMQ_USER=${RABBITMQ_USER}
       - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD}
-      - JAVA_OPTS=-Xmx96m -Xms64m
+      - JAVA_TOOL_OPTIONS=-Xmx128m -Xms64m -XX:+UseSerialGC -XX:MaxMetaspaceSize=64m
     deploy:
       resources:
         limits:
           cpus: "0.20"
-          memory: 256M
+          memory: 320M
         reservations:
           cpus: "0.10"
-          memory: 128M
+          memory: 192M
 
   payment-service:
     image: ${DOCKERHUB_USERNAME}/payment-service:latest
