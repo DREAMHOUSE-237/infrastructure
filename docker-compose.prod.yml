@@ -114,9 +114,11 @@ services:
       - "8083:3003"
     environment:
       - DATABASE_URL=mysql://commentary_user:nflorinda124@dreamhouse237-db.cbc4i248y7jv.eu-north-1.rds.amazonaws.com:3306/commentary_db
-      - HOST_IP=172.31.47.28
-      - APP_PORT=8083
-      - EUREKA_URL=http://ec2-16-171-142-15.eu-north-1.compute.amazonaws.com:8761/eureka
+      - APP_HOST=ec2-16-171-142-15.eu-north-1.compute.amazonaws.com
+      - APP_PORT=3003
+      - EUREKA_HOST=ec2-16-171-142-15.eu-north-1.compute.amazonaws.com
+      - EUREKA_PORT=8761
+      - EUREKA_IP_ADDR=172.31.47.28
       - RABBITMQ_URL=amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@ec2-16-171-142-15.eu-north-1.compute.amazonaws.com:5672/%2f
       - PORT=3003
     deploy:
