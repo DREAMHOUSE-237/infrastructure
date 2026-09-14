@@ -82,6 +82,8 @@ jobs:
             export IDENTITY_DB_NAME=${{ secrets.IDENTITY_DB_NAME }}
             export IDENTITY_DB_USER=${{ secrets.IDENTITY_DB_USER }}
             export IDENTITY_DB_PASSWORD=${{ secrets.IDENTITY_DB_PASSWORD }}
+            export PUBLICATION_DB_USER=${{ secrets.PUBLICATION_DB_USER }}
+            export PUBLICATION_DB_PASSWORD=${{ secrets.PUBLICATION_DB_PASSWORD }}
             export CAMPAY_TOKEN=${{ secrets.CAMPAY_TOKEN }}
             export CAMPAY_USERNAME=${{ secrets.CAMPAY_USERNAME }}
             export CAMPAY_PASSWORD=${{ secrets.CAMPAY_PASSWORD }}
