@@ -1,16 +1,20 @@
-version: "3.9"
-
 networks:
   traefik-net:
-    driver: bridge
+    driver: overlay
+    attachable: true
 
 services:
   config-service:
     image: ${DOCKERHUB_USERNAME}/config-service:latest
-    restart: always
     ports:
       - "8888:8888"
     deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+      placement:
+        constraints:
+          - node.labels.zone == gateway
       resources:
         limits:
           cpus: "0.20"
@@ -21,12 +25,15 @@ services:
 
   registry-service:
     image: ${DOCKERHUB_USERNAME}/registry-service:latest
-    restart: always
     ports:
       - "8761:8761"
-    depends_on:
-      - config-service
     deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+      placement:
+        constraints:
+          - node.labels.zone == gateway
       resources:
         limits:
           cpus: "0.20"
@@ -37,8 +44,6 @@ services:
 
   messagebroker-service:
     image: rabbitmq:3-management
-    container_name: messagebroker-service
-    restart: always
     ports:
       - "5672:5672"
       - "15672:15672"
@@ -46,6 +51,12 @@ services:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
     deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+      placement:
+        constraints:
+          - node.labels.zone == gateway
       resources:
         limits:
           cpus: "0.30"
@@ -56,7 +67,6 @@ services:
 
   auth-service:
     image: ${DOCKERHUB_USERNAME}/auth-service:latest
-    restart: always
     ports:
       - "8081:8001"
     environment:
@@ -70,6 +80,12 @@ services:
       - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD}
       - CONFIG_SERVER_URL=http://ec2-16-171-42-48.eu-north-1.compute.amazonaws.com:8888
     deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+      placement:
+        constraints:
+          - node.labels.zone == app
       resources:
         limits:
           cpus: "0.20"
@@ -80,7 +96,6 @@ services:
 
   user-service:
     image: ${DOCKERHUB_USERNAME}/user-service:latest
-    restart: always
     ports:
       - "8082:8000"
     environment:
@@ -99,6 +114,12 @@ services:
       - START_RABBITMQ_CONSUMER=true
       - FRONTEND_BASE_URL=https://dreamhouse237.onrender.com
     deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+      placement:
+        constraints:
+          - node.labels.zone == app
       resources:
         limits:
           cpus: "0.30"
@@ -109,7 +130,6 @@ services:
 
   commentary-service:
     image: ${DOCKERHUB_USERNAME}/commentary-service:latest
-    restart: always
     ports:
       - "8083:3003"
     environment:
@@ -122,6 +142,12 @@ services:
       - RABBITMQ_URL=amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@ec2-16-171-42-48.eu-north-1.compute.amazonaws.com:5672/%2f
       - PORT=3003
     deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+      placement:
+        constraints:
+          - node.labels.zone == app
       resources:
         limits:
           cpus: "0.20"
@@ -132,7 +158,6 @@ services:
 
   publication-service:
     image: ${DOCKERHUB_USERNAME}/publication-service:latest
-    restart: always
     ports:
       - "8085:8085"
     environment:
@@ -144,6 +169,12 @@ services:
       - MAIL_PASSWORD=${MAIL_PASSWORD}
       - JAVA_TOOL_OPTIONS=-Xmx96m -Xms48m -XX:+UseSerialGC -XX:MaxMetaspaceSize=128m -XX:CompressedClassSpaceSize=32m
     deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+      placement:
+        constraints:
+          - node.labels.zone == app
       resources:
         limits:
           cpus: "0.20"
@@ -154,7 +185,6 @@ services:
 
   payment-service:
     image: ${DOCKERHUB_USERNAME}/payment-service:latest
-    restart: always
     ports:
       - "8086:8086"
     environment:
@@ -182,6 +212,12 @@ services:
       - PAYMENT_INIT_QUEUE=payment-queue
       - PAYMENT_STATUS_QUEUE=payment-status
     deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+      placement:
+        constraints:
+          - node.labels.zone == app
       resources:
         limits:
           cpus: "0.20"
@@ -192,7 +228,6 @@ services:
 
   identity-verification-service:
     image: ${DOCKERHUB_USERNAME}/identity-verification-service:latest
-    restart: always
     ports:
       - "8087:8087"
     environment:
@@ -211,6 +246,12 @@ services:
       - MYSQL_PORT=${MYSQL_PORT}
       - RABBITMQ_URL=amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@ec2-16-171-42-48.eu-north-1.compute.amazonaws.com:5672/%2f
     deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+      placement:
+        constraints:
+          - node.labels.zone == app
       resources:
         limits:
           cpus: "0.20"
@@ -221,12 +262,17 @@ services:
 
   proxy-service:
     image: ${DOCKERHUB_USERNAME}/proxy-service:latest
-    restart: always
     networks:
       - traefik-net
     expose:
       - "8080"
     deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+      placement:
+        constraints:
+          - node.labels.zone == gateway
       resources:
         limits:
           cpus: "0.30"
@@ -234,7 +280,6 @@ services:
 
   traefik:
     image: traefik:v3.3
-    restart: always
     networks:
       - traefik-net
     ports:
@@ -256,6 +301,12 @@ services:
       - "./letsencrypt:/letsencrypt"
       - "./traefik-dynamic.yml:/etc/traefik/dynamic.yml:ro"
     deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+      placement:
+        constraints:
+          - node.labels.zone == gateway
       resources:
         limits:
           cpus: "0.20"

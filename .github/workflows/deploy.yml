@@ -22,23 +22,14 @@ jobs:
       - name: Checkout infrastructure repo
         uses: actions/checkout@v4
 
-      - name: Set target host
-        id: sethost
-        run: |
-          SERVICE_TYPE=${{ github.event.action }}
-          case "$SERVICE_TYPE" in
-            deploy-config-service|deploy-registry-service|deploy-proxy-service|deploy-messagebroker-service)
-              echo "HOST=${{ secrets.EC2_HOST2 }}" >> $GITHUB_ENV
-              ;;
-            *)
-              echo "HOST=${{ secrets.EC2_HOST }}" >> $GITHUB_ENV
-              ;;
-          esac
-
       - name: Deploy with SSH
         uses: appleboy/ssh-action@v0.1.10
         with:
-          host: ${{ env.HOST }}
+          # The stack is deployed once against the swarm manager (EC2_HOST);
+          # Swarm itself schedules each service onto EC2_HOST or EC2_HOST2
+          # based on the node.labels.zone placement constraints in
+          # docker-compose.prod.yml. There is no more per-service host pick.
+          host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
@@ -91,7 +82,9 @@ jobs:
             export MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}
             export PAYMENT_SECRET_KEY=${{ secrets.PAYMENT_SECRET_KEY }}
 
-            echo "🚀 Déploiement du service ${SERVICE_TYPE} sur ${{ env.HOST }}..."
-            docker compose -f docker-compose.prod.yml pull ${SERVICE_TYPE#deploy-}
-            docker compose -f docker-compose.prod.yml up -d ${SERVICE_TYPE#deploy-}
-            docker ps
+            echo "🚀 Déploiement de la stack (déclenché par ${SERVICE_TYPE})..."
+            # --resolve-image always forces Swarm to re-check the :latest
+            # digest on the registry, otherwise it would treat an unchanged
+            # image tag as "nothing to update" even after a new push.
+            docker stack deploy -c docker-compose.prod.yml --resolve-image always --with-registry-auth dreamhouse
+            docker stack services dreamhouse
