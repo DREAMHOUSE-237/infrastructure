@@ -71,6 +71,23 @@ jobs:
             export DB_URL_IDENTITY=${{ secrets.DB_URL_IDENTITY }}
             export RABBITMQ_USER=${{ secrets.RABBITMQ_USER }}
             export RABBITMQ_PASSWORD=${{ secrets.RABBITMQ_PASSWORD }}
+            export MYSQL_HOST=${{ secrets.MYSQL_HOST }}
+            export MYSQL_PORT=${{ secrets.MYSQL_PORT }}
+            export USER_DB_NAME=${{ secrets.USER_DB_NAME }}
+            export USER_DB_USER=${{ secrets.USER_DB_USER }}
+            export USER_DB_PASSWORD=${{ secrets.USER_DB_PASSWORD }}
+            export PAYMENT_DB_NAME=${{ secrets.PAYMENT_DB_NAME }}
+            export PAYMENT_DB_USER=${{ secrets.PAYMENT_DB_USER }}
+            export PAYMENT_DB_PASSWORD=${{ secrets.PAYMENT_DB_PASSWORD }}
+            export IDENTITY_DB_NAME=${{ secrets.IDENTITY_DB_NAME }}
+            export IDENTITY_DB_USER=${{ secrets.IDENTITY_DB_USER }}
+            export IDENTITY_DB_PASSWORD=${{ secrets.IDENTITY_DB_PASSWORD }}
+            export CAMPAY_TOKEN=${{ secrets.CAMPAY_TOKEN }}
+            export CAMPAY_USERNAME=${{ secrets.CAMPAY_USERNAME }}
+            export CAMPAY_PASSWORD=${{ secrets.CAMPAY_PASSWORD }}
+            export MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}
+            export MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}
+            export PAYMENT_SECRET_KEY=${{ secrets.PAYMENT_SECRET_KEY }}
 
             echo "🚀 Déploiement du service ${SERVICE_TYPE} sur ${{ env.HOST }}..."
             docker compose -f docker-compose.prod.yml pull ${SERVICE_TYPE#deploy-}
