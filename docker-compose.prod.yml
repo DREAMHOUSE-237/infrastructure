@@ -3,6 +3,13 @@ networks:
     driver: overlay
     attachable: true
 
+volumes:
+  letsencrypt:
+
+configs:
+  traefik_dynamic:
+    file: ./traefik-dynamic.yml
+
 services:
   config-service:
     image: ${DOCKERHUB_USERNAME}/config-service:latest
@@ -310,8 +317,10 @@ services:
       - "--providers.file.filename=/etc/traefik/dynamic.yml"
       - "--providers.file.watch=true"
     volumes:
-      - "./letsencrypt:/letsencrypt"
-      - "./traefik-dynamic.yml:/etc/traefik/dynamic.yml:ro"
+      - letsencrypt:/letsencrypt
+    configs:
+      - source: traefik_dynamic
+        target: /etc/traefik/dynamic.yml
     deploy:
       replicas: 1
       restart_policy:
