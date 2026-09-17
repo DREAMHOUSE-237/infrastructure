@@ -14,7 +14,10 @@ services:
   config-service:
     image: ${DOCKERHUB_USERNAME}/config-service:latest
     ports:
-      - "8888:8888"
+      - target: 8888
+        published: 8888
+        protocol: tcp
+        mode: host
     deploy:
       replicas: 1
       restart_policy:
@@ -33,7 +36,10 @@ services:
   registry-service:
     image: ${DOCKERHUB_USERNAME}/registry-service:latest
     ports:
-      - "8761:8761"
+      - target: 8761
+        published: 8761
+        protocol: tcp
+        mode: host
     deploy:
       replicas: 1
       restart_policy:
@@ -52,8 +58,14 @@ services:
   messagebroker-service:
     image: rabbitmq:3-management
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - target: 5672
+        published: 5672
+        protocol: tcp
+        mode: host
+      - target: 15672
+        published: 15672
+        protocol: tcp
+        mode: host
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
