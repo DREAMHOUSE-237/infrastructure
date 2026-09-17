@@ -1,7 +1,7 @@
 http:
   routers:
     proxy:
-      rule: "Host(`api.16.171.142.15.nip.io`)"
+      rule: "Host(`api.16.171.110.76.nip.io`)"
       entryPoints:
         - websecure
       tls:

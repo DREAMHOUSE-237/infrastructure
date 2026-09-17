@@ -71,14 +71,14 @@ services:
       - "8081:8001"
     environment:
       - DATABASE_URL=${DB_URL_AUTH}
-      - INSTANCE_HOST=172.31.47.28
+      - INSTANCE_HOST=172.31.17.179
       - APP_PORT=8081
-      - EUREKA_URL=http://ec2-16-171-42-48.eu-north-1.compute.amazonaws.com:8761/eureka
-      - RABBITMQ_HOST=ec2-16-171-42-48.eu-north-1.compute.amazonaws.com
+      - EUREKA_URL=http://ec2-16-171-110-76.eu-north-1.compute.amazonaws.com:8761/eureka
+      - RABBITMQ_HOST=ec2-16-171-110-76.eu-north-1.compute.amazonaws.com
       - RABBITMQ_PORT=5672
       - RABBITMQ_USER=${RABBITMQ_USER}
       - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD}
-      - CONFIG_SERVER_URL=http://ec2-16-171-42-48.eu-north-1.compute.amazonaws.com:8888
+      - CONFIG_SERVER_URL=http://ec2-16-171-110-76.eu-north-1.compute.amazonaws.com:8888
     deploy:
       replicas: 1
       restart_policy:
@@ -99,10 +99,10 @@ services:
     ports:
       - "8082:8000"
     environment:
-      - HOST_IP=172.31.47.28
+      - HOST_IP=172.31.17.179
       - APP_PORT=8082
-      - EUREKA_URL=http://ec2-16-171-42-48.eu-north-1.compute.amazonaws.com:8761/eureka
-      - CONFIG_SERVER_URL=http://ec2-16-171-42-48.eu-north-1.compute.amazonaws.com:8888
+      - EUREKA_URL=http://ec2-16-171-110-76.eu-north-1.compute.amazonaws.com:8761/eureka
+      - CONFIG_SERVER_URL=http://ec2-16-171-110-76.eu-north-1.compute.amazonaws.com:8888
       - APP_NAME=users
       - PROFILE=default
       - MYSQL_DATABASE=${USER_DB_NAME}
@@ -110,7 +110,7 @@ services:
       - MYSQL_PASSWORD=${USER_DB_PASSWORD}
       - MYSQL_HOST=${MYSQL_HOST}
       - MYSQL_PORT=${MYSQL_PORT}
-      - RABBITMQ_URL=amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@ec2-16-171-42-48.eu-north-1.compute.amazonaws.com:5672/%2f
+      - RABBITMQ_URL=amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@ec2-16-171-110-76.eu-north-1.compute.amazonaws.com:5672/%2f
       - START_RABBITMQ_CONSUMER=true
       - FRONTEND_BASE_URL=https://dreamhouse237.onrender.com
     deploy:
@@ -134,12 +134,12 @@ services:
       - "8083:3003"
     environment:
       - DATABASE_URL=${DB_URL_COMMENTARY}
-      - APP_HOST=ec2-16-171-42-48.eu-north-1.compute.amazonaws.com
+      - APP_HOST=ec2-16-171-110-76.eu-north-1.compute.amazonaws.com
       - APP_PORT=8083
-      - EUREKA_HOST=ec2-16-171-42-48.eu-north-1.compute.amazonaws.com
+      - EUREKA_HOST=ec2-16-171-110-76.eu-north-1.compute.amazonaws.com
       - EUREKA_PORT=8761
-      - EUREKA_IP_ADDR=172.31.47.28
-      - RABBITMQ_URL=amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@ec2-16-171-42-48.eu-north-1.compute.amazonaws.com:5672/%2f
+      - EUREKA_IP_ADDR=172.31.17.179
+      - RABBITMQ_URL=amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@ec2-16-171-110-76.eu-north-1.compute.amazonaws.com:5672/%2f
       - PORT=3003
     deploy:
       replicas: 1
@@ -188,16 +188,16 @@ services:
     ports:
       - "8086:8086"
     environment:
-      - HOST_IP=172.31.47.28
+      - HOST_IP=172.31.17.179
       - APP_PORT=8086
-      - EUREKA_URL=http://ec2-16-171-42-48.eu-north-1.compute.amazonaws.com:8761/eureka
-      - CONFIG_SERVER_URL=http://ec2-16-171-42-48.eu-north-1.compute.amazonaws.com:8888
+      - EUREKA_URL=http://ec2-16-171-110-76.eu-north-1.compute.amazonaws.com:8761/eureka
+      - CONFIG_SERVER_URL=http://ec2-16-171-110-76.eu-north-1.compute.amazonaws.com:8888
       - MYSQL_USER=${PAYMENT_DB_USER}
       - MYSQL_PASSWORD=${PAYMENT_DB_PASSWORD}
       - MYSQL_HOST=${MYSQL_HOST}
       - MYSQL_PORT=${MYSQL_PORT}
       - MYSQL_DB=${PAYMENT_DB_NAME}
-      - RABBITMQ_HOST=ec2-16-171-42-48.eu-north-1.compute.amazonaws.com
+      - RABBITMQ_HOST=ec2-16-171-110-76.eu-north-1.compute.amazonaws.com
       - RABBITMQ_PORT=5672
       - RABBITMQ_USER=${RABBITMQ_USER}
       - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD}
@@ -233,10 +233,10 @@ services:
     environment:
       - DJANGO_ENV=production
       - WORKER_ID=0
-      - HOST_IP=172.31.47.28
+      - HOST_IP=172.31.17.179
       - APP_PORT=8087
-      - EUREKA_URL=http://ec2-16-171-42-48.eu-north-1.compute.amazonaws.com:8761/eureka
-      - CONFIG_SERVER_URL=http://ec2-16-171-42-48.eu-north-1.compute.amazonaws.com:8888
+      - EUREKA_URL=http://ec2-16-171-110-76.eu-north-1.compute.amazonaws.com:8761/eureka
+      - CONFIG_SERVER_URL=http://ec2-16-171-110-76.eu-north-1.compute.amazonaws.com:8888
       - APP_NAME=IDENTITY-SERVICE
       - PROFILE=default
       - MYSQL_DATABASE=${IDENTITY_DB_NAME}
@@ -244,7 +244,7 @@ services:
       - MYSQL_PASSWORD=${IDENTITY_DB_PASSWORD}
       - MYSQL_HOST=${MYSQL_HOST}
       - MYSQL_PORT=${MYSQL_PORT}
-      - RABBITMQ_URL=amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@ec2-16-171-42-48.eu-north-1.compute.amazonaws.com:5672/%2f
+      - RABBITMQ_URL=amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@ec2-16-171-110-76.eu-north-1.compute.amazonaws.com:5672/%2f
     deploy:
       replicas: 1
       restart_policy:
