@@ -55,11 +55,7 @@ jobs:
 
             export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
             export DB_URL_AUTH=${{ secrets.DB_URL_AUTH }}
-            export DB_URL_USER=${{ secrets.DB_URL_USER }}
             export DB_URL_COMMENTARY=${{ secrets.DB_URL_COMMENTARY }}
-            export DB_URL_PUBLICATION=${{ secrets.DB_URL_PUBLICATION }}
-            export DB_URL_PAYMENT=${{ secrets.DB_URL_PAYMENT }}
-            export DB_URL_IDENTITY=${{ secrets.DB_URL_IDENTITY }}
             export RABBITMQ_USER=${{ secrets.RABBITMQ_USER }}
             export RABBITMQ_PASSWORD=${{ secrets.RABBITMQ_PASSWORD }}
             export MYSQL_HOST=${{ secrets.MYSQL_HOST }}
@@ -75,6 +71,9 @@ jobs:
             export IDENTITY_DB_PASSWORD=${{ secrets.IDENTITY_DB_PASSWORD }}
             export PUBLICATION_DB_USER=${{ secrets.PUBLICATION_DB_USER }}
             export PUBLICATION_DB_PASSWORD=${{ secrets.PUBLICATION_DB_PASSWORD }}
+            export CLOUDINARY_CLOUD_NAME=${{ secrets.CLOUDINARY_CLOUD_NAME }}
+            export CLOUDINARY_API_KEY=${{ secrets.CLOUDINARY_API_KEY }}
+            export CLOUDINARY_API_SECRET=${{ secrets.CLOUDINARY_API_SECRET }}
             export CAMPAY_TOKEN=${{ secrets.CAMPAY_TOKEN }}
             export CAMPAY_USERNAME=${{ secrets.CAMPAY_USERNAME }}
             export CAMPAY_PASSWORD=${{ secrets.CAMPAY_PASSWORD }}
