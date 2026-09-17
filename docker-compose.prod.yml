@@ -69,6 +69,8 @@ services:
     image: ${DOCKERHUB_USERNAME}/auth-service:latest
     ports:
       - "8081:8001"
+    volumes:
+      - "./certs/global-bundle.pem:/certs/global-bundle.pem:ro"
     environment:
       - DATABASE_URL=${DB_URL_AUTH}
       - INSTANCE_HOST=172.31.17.179
@@ -98,6 +100,8 @@ services:
     image: ${DOCKERHUB_USERNAME}/user-service:latest
     ports:
       - "8082:8000"
+    volumes:
+      - "./certs/global-bundle.pem:/certs/global-bundle.pem:ro"
     environment:
       - HOST_IP=172.31.17.179
       - APP_PORT=8082
@@ -132,6 +136,8 @@ services:
     image: ${DOCKERHUB_USERNAME}/commentary-service:latest
     ports:
       - "8083:3003"
+    volumes:
+      - "./certs/global-bundle.pem:/certs/global-bundle.pem:ro"
     environment:
       - DATABASE_URL=${DB_URL_COMMENTARY}
       - APP_HOST=ec2-16-171-110-76.eu-north-1.compute.amazonaws.com
@@ -160,6 +166,8 @@ services:
     image: ${DOCKERHUB_USERNAME}/publication-service:latest
     ports:
       - "8085:8085"
+    volumes:
+      - "./certs/global-bundle.pem:/certs/global-bundle.pem:ro"
     environment:
       - RABBITMQ_USER=${RABBITMQ_USER}
       - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD}
@@ -187,6 +195,8 @@ services:
     image: ${DOCKERHUB_USERNAME}/payment-service:latest
     ports:
       - "8086:8086"
+    volumes:
+      - "./certs/global-bundle.pem:/certs/global-bundle.pem:ro"
     environment:
       - HOST_IP=172.31.17.179
       - APP_PORT=8086
@@ -230,6 +240,8 @@ services:
     image: ${DOCKERHUB_USERNAME}/identity-verification-service:latest
     ports:
       - "8087:8087"
+    volumes:
+      - "./certs/global-bundle.pem:/certs/global-bundle.pem:ro"
     environment:
       - DJANGO_ENV=production
       - WORKER_ID=0
