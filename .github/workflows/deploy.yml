@@ -13,6 +13,12 @@ on:
       - deploy-registry-service
       - deploy-config-service
       - deploy-messagebroker-service
+  # Manual trigger: unlike "Re-run all jobs" (which replays the workflow
+  # file as it was at that historical run's commit), this always runs the
+  # current version of deploy.yml on main with fresh secrets. Use the
+  # "Run workflow" button on this workflow's Actions page for a real
+  # from-scratch redeploy.
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -74,7 +80,7 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            SERVICE_TYPE=${{ github.event.action }}
+            SERVICE_TYPE="${{ github.event.action || 'manual trigger' }}"
 
             cd /home/ubuntu
 
