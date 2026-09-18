@@ -12,7 +12,7 @@ configs:
   # content changes. Bump the "_vN" suffix here AND in the service's
   # `configs:` reference below whenever the file changes, otherwise the
   # old content keeps being served silently.
-  traefik_dynamic_v2:
+  traefik_dynamic_v3:
     file: ./traefik-dynamic.yml
 
 services:
@@ -339,7 +339,7 @@ services:
     volumes:
       - letsencrypt:/letsencrypt
     configs:
-      - source: traefik_dynamic_v2
+      - source: traefik_dynamic_v3
         target: /etc/traefik/dynamic.yml
     deploy:
       replicas: 1

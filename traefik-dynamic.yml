@@ -1,7 +1,7 @@
 http:
   routers:
     proxy:
-      rule: "Host(`ec2-16-171-110-76.eu-north-1.compute.amazonaws.com`)"
+      rule: "Host(`api.16.171.110.76.nip.io`)"
       entryPoints:
         - websecure
       tls:
