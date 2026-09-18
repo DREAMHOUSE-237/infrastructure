@@ -19,6 +19,47 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Validate required secrets are set
+        run: |
+          missing=""
+          check() { [ -z "$2" ] && missing="$missing $1"; }
+          check DOCKERHUB_USERNAME "${{ secrets.DOCKERHUB_USERNAME }}"
+          check DB_URL_AUTH "${{ secrets.DB_URL_AUTH }}"
+          check DB_URL_COMMENTARY "${{ secrets.DB_URL_COMMENTARY }}"
+          check RABBITMQ_USER "${{ secrets.RABBITMQ_USER }}"
+          check RABBITMQ_PASSWORD "${{ secrets.RABBITMQ_PASSWORD }}"
+          check MYSQL_HOST "${{ secrets.MYSQL_HOST }}"
+          check MYSQL_PORT "${{ secrets.MYSQL_PORT }}"
+          check USER_DB_NAME "${{ secrets.USER_DB_NAME }}"
+          check USER_DB_USER "${{ secrets.USER_DB_USER }}"
+          check USER_DB_PASSWORD "${{ secrets.USER_DB_PASSWORD }}"
+          check PAYMENT_DB_NAME "${{ secrets.PAYMENT_DB_NAME }}"
+          check PAYMENT_DB_USER "${{ secrets.PAYMENT_DB_USER }}"
+          check PAYMENT_DB_PASSWORD "${{ secrets.PAYMENT_DB_PASSWORD }}"
+          check IDENTITY_DB_NAME "${{ secrets.IDENTITY_DB_NAME }}"
+          check IDENTITY_DB_USER "${{ secrets.IDENTITY_DB_USER }}"
+          check IDENTITY_DB_PASSWORD "${{ secrets.IDENTITY_DB_PASSWORD }}"
+          check PUBLICATION_DB_USER "${{ secrets.PUBLICATION_DB_USER }}"
+          check PUBLICATION_DB_PASSWORD "${{ secrets.PUBLICATION_DB_PASSWORD }}"
+          check CLOUDINARY_CLOUD_NAME "${{ secrets.CLOUDINARY_CLOUD_NAME }}"
+          check CLOUDINARY_API_KEY "${{ secrets.CLOUDINARY_API_KEY }}"
+          check CLOUDINARY_API_SECRET "${{ secrets.CLOUDINARY_API_SECRET }}"
+          check CAMPAY_TOKEN "${{ secrets.CAMPAY_TOKEN }}"
+          check CAMPAY_USERNAME "${{ secrets.CAMPAY_USERNAME }}"
+          check CAMPAY_PASSWORD "${{ secrets.CAMPAY_PASSWORD }}"
+          check MAIL_USERNAME "${{ secrets.MAIL_USERNAME }}"
+          check MAIL_PASSWORD "${{ secrets.MAIL_PASSWORD }}"
+          check PAYMENT_SECRET_KEY "${{ secrets.PAYMENT_SECRET_KEY }}"
+          check EC2_HOST "${{ secrets.EC2_HOST }}"
+          check EC2_USER "${{ secrets.EC2_USER }}"
+          check EC2_SSH_KEY "${{ secrets.EC2_SSH_KEY }}"
+          if [ -n "$missing" ]; then
+            echo "::error::Empty or missing GitHub secrets, deploy aborted:$missing"
+            echo "Fix them in Settings > Secrets and variables > Actions, then re-run this workflow."
+            exit 1
+          fi
+          echo "All required secrets are present."
+
       - name: Checkout infrastructure repo
         uses: actions/checkout@v4
 
