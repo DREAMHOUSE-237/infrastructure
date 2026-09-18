@@ -1,7 +1,7 @@
 http:
   routers:
     proxy:
-      rule: "Host(`api.16.171.110.76.nip.io`)"
+      rule: "Host(`dreamhouse237.duckdns.org`)"
       entryPoints:
         - websecure
       tls:
