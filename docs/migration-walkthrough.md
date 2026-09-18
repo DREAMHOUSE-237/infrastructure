@@ -187,14 +187,19 @@ la main à chaque migration :
 | `src/main/resources/application.properties` | `registry-service`, `proxy-service`, `publication-service` | Même URL Eureka/Config Server, dupliquée **dans le repo du service lui-même** (bootstrap avant que le service sache parler à `config-service`) — ne pas oublier celle-ci, c'est elle qui avait causé des crash-loops silencieux la dernière fois |
 | `docker-compose.prod.yml` (ligne `INSTANCE_HOST=...`) | `infrastructure` | IP **privée** du nœud app |
 | `publication-service.properties` | `config` | IP privée du nœud app (`eureka.instance.hostname`, `eureka.instance.ip-address`, `eureka.instance.instance-id`) + endpoint RDS dans `spring.datasource.url` |
-| `traefik-dynamic.yml` | `infrastructure` | Domaine `nip.io` du nœud gateway (règle de routage TLS, ex. `Host(\`api.<nouvelle-ip>.nip.io\`)`) |
-| `.env` | `mobile-app` | `API_URL` (nouveau domaine `nip.io` du gateway) |
+| `traefik-dynamic.yml` | `infrastructure` | Domaine du nœud gateway dans la règle de routage TLS (ex. `Host(\`ec2-<nouvelle-ip>.eu-north-1.compute.amazonaws.com\`)`) |
+| `.env` | `mobile-app` | `API_URL` (nouveau DNS public du gateway) |
+| Variable d'environnement frontend | Dashboard **Render** (hors repo) | URL de l'API consommée par le frontend web |
 | `settings.py` (valeur de repli uniquement, jamais utilisée si `MYSQL_HOST` est bien configuré) | `auth-service` | Ancien endpoint RDS en fallback — à nettoyer par la même occasion |
 
-Format des adresses gateway : EC2 utilise des tirets dans son DNS public
-(`ec2-16-171-110-76.eu-north-1...`) mais le domaine `nip.io` utilisé pour
-le TLS utilise des points (`api.16.171.110.76.nip.io`) — ne pas confondre
-les deux formats en cherchant/remplaçant.
+Depuis le 18/09/2026, l'entrée publique (Traefik) utilise directement le
+DNS public fourni par AWS (`ec2-<ip-tirets>.eu-north-1.compute.amazonaws.com`)
+pour le certificat Let's Encrypt, **plus `nip.io`** — ce service DNS tiers
+gratuit s'est révélé peu fiable (résolution DNS qui échoue ou traîne selon
+le réseau du client, y compris hors VPN) et a causé des paiements bloqués
+en silence côté frontend. Un seul format d'adresse (celui d'AWS, avec des
+tirets) est donc utilisé partout désormais, en interne comme en externe —
+plus de confusion entre deux formats différents.
 
 ---
 
@@ -223,7 +228,7 @@ configuré côté [dashboard marchand Campay](https://www.campay.net) (ou
 
 1. Se connecter au dashboard
 2. Paramètres de l'app → Webhook / Callback URL
-3. Remplacer par `https://api.<nouvelle-ip>.nip.io/payment-service/webhook/campay`
+3. Remplacer par `https://ec2-<nouvelle-ip>.eu-north-1.compute.amazonaws.com/payment-service/webhook/campay`
 
 Si ce n'est pas fait, les paiements restent bloqués indéfiniment en
 `PENDING` (Campay traite le paiement mais ne peut jamais notifier le
@@ -244,7 +249,7 @@ curl http://<ip-privee-gateway>:8761/eureka/apps -H "Accept: application/json"
 docker exec $(docker ps -q -f name=dreamhouse_messagebroker-service) rabbitmq-diagnostics -q ping
 
 # Le gateway répond en HTTPS
-curl https://api.<nouvelle-ip>.nip.io/PUBLICATION-SERVICE/api/biens
+curl https://ec2-<nouvelle-ip>.eu-north-1.compute.amazonaws.com/PUBLICATION-SERVICE/api/biens
 ```
 
 Puis test fonctionnel complet depuis le frontend web (ou l'app mobile
