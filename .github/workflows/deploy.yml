@@ -28,7 +28,7 @@ jobs:
       - name: Validate required secrets are set
         run: |
           missing=""
-          check() { [ -z "$2" ] && missing="$missing $1"; }
+          check() { if [ -z "$2" ]; then missing="$missing $1"; fi; return 0; }
           check DOCKERHUB_USERNAME "${{ secrets.DOCKERHUB_USERNAME }}"
           check DB_URL_AUTH "${{ secrets.DB_URL_AUTH }}"
           check DB_URL_COMMENTARY "${{ secrets.DB_URL_COMMENTARY }}"
