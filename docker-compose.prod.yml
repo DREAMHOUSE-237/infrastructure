@@ -6,10 +6,6 @@ networks:
 volumes:
   letsencrypt:
 
-configs:
-  traefik_dynamic:
-    file: ./traefik-dynamic.yml
-
 services:
   config-service:
     image: ${DOCKERHUB_USERNAME}/config-service:latest
@@ -333,9 +329,7 @@ services:
       - "--providers.file.watch=true"
     volumes:
       - letsencrypt:/letsencrypt
-    configs:
-      - source: traefik_dynamic
-        target: /etc/traefik/dynamic.yml
+      - "./traefik-dynamic.yml:/etc/traefik/dynamic.yml:ro"
     deploy:
       replicas: 1
       restart_policy:
