@@ -328,6 +328,12 @@ services:
       - "--log.level=INFO"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
+      # Default readTimeout was cutting off large multipart uploads
+      # (property photos) partway through at ~60s, well before the
+      # backend's own (already-raised) timeouts kicked in.
+      - "--entrypoints.websecure.transport.respondingTimeouts.readTimeout=180s"
+      - "--entrypoints.websecure.transport.respondingTimeouts.writeTimeout=180s"
+      - "--entrypoints.websecure.transport.respondingTimeouts.idleTimeout=180s"
       - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
       - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
       - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
